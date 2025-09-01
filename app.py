@@ -12,7 +12,7 @@ sns.set_palette("pastel")
 st.set_page_config(page_title="Predição de Compras", layout="wide")
 st.title("📊 Predição de Compras - 30, 60 e 90 dias")
 
-with st.expander("ℹ️ Sobre o modelo", expanded=True):
+with st.expander("ℹ️ Sobre o modelo", expanded=False):
     st.markdown(
         """
         <div style="background-color: #f0f2f6; padding: 16px; border-radius: 8px;">
@@ -150,13 +150,28 @@ col1, col2 = st.columns(2)
 
 with col1:
     periodo_filtro = st.selectbox("Período para filtrar", periodos_disp)
-    prob_min = st.slider("Probabilidade mínima", 0.0, 1.0, 0.5, 0.01)
+    prob_min = st.slider("Probabilidade mínima", 0.0, 1.0, 0.1, 0.01)
     df_filtrado = df_clientes_base[df_clientes_base[periodo_filtro] >= prob_min]
     st.write(f"{len(df_filtrado)} clientes encontrados")
 
     # Mostrar apenas colunas disponíveis naquele conjunto
     cols_para_mostrar = ["cliente_id", "Valor_Médio"] + periodos_disp
-    st.dataframe(df_filtrado[cols_para_mostrar].sort_values(periodo_filtro, ascending=False))
+    df_para_mostrar = df_filtrado[cols_para_mostrar].sort_values(periodo_filtro, ascending=False)
+    
+    st.dataframe(df_para_mostrar)
+    
+    # Botão para exportar
+    if len(df) > 0:
+        df_para_exportar = df[['cliente_id', 'data_compra', 'prob_30d','prob_60d', 'prob_90d']].copy()
+        df_para_exportar = df_para_exportar.sort_values(by = "prob_30d", ascending=False)
+        df_para_exportar.columns = ["Cliente", "Data Compra", "Probabilidade de compra em 30 dias", "Prob. 60 dias", "Prob. 90 dias"]
+        csv = df_para_exportar.to_csv(index=False)
+        st.download_button(
+            label="📥 Exportar dados (CSV)",
+            data=csv,
+            file_name=f"previsoes_recompra.csv",
+            mime="text/csv"
+        )
 
 # ---- Busca individual ----
 with col2:
