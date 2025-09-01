@@ -5,12 +5,187 @@ import seaborn as sns
 import numpy as np
 from sklearn.metrics import confusion_matrix, accuracy_score
 from datetime import timedelta
-
+import base64
+from io import BytesIO
 
 
 sns.set_palette("pastel")
 st.set_page_config(page_title="Predição de Compras", layout="wide")
-st.title("📊 Predição de Compras - 30, 60 e 90 dias")
+# st.title("📊 Predição de Recompra")
+
+
+# Função para converter imagem em base64
+def get_image_base64(image_path):
+    """Converte uma imagem em string base64 para uso no HTML"""
+    try:
+        with open(image_path, "rb") as img_file:
+            return base64.b64encode(img_file.read()).decode()
+    except FileNotFoundError:
+        return None
+
+# CSS personalizado para o cabeçalho com logo
+st.markdown("""
+<style>
+.header-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 0;
+    margin-bottom: 2rem;
+    border-bottom: 2px solid #f0f2f6;
+}
+
+.logo-container {
+    flex: 0 0 auto;
+}
+
+.logo-container img {
+    height: 150px;
+    width: auto;
+}
+
+.title-container {
+    flex: 1;
+    text-align: center;
+    color: #F5B52E;
+}
+
+.title-container h1 {
+    margin: 0;
+    color: #F5B52E;
+    font-size: 2.5rem;
+}
+
+@media (max-width: 768px) {
+    .header-container {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .logo-container {
+        margin-bottom: 1rem;
+    }
+    
+    .title-container h1 {
+        font-size: 2rem;
+    }
+}
+</style>
+""", unsafe_allow_html=True)
+
+# CSS personalizado para botões - ADICIONE AQUI
+st.markdown("""
+<style>
+/* Estilização dos botões principais */
+.stButton > button {
+    background-color: #F5B52E !important;
+    color: white !important;
+    border: none !important;
+    border-radius: 4px !important;
+    font-weight: 500 !important;
+}
+
+.stButton > button:hover {
+    background-color: #E6A629 !important;
+    color: white !important;
+    border: none !important;
+}
+
+.stButton > button:active, .stButton > button:focus {
+    background-color: #D4961F !important;
+    color: white !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+
+/* Estilização dos botões de download */
+.stDownloadButton > button {
+    background-color: #F5B52E !important;
+    color: white !important;
+    border: none !important;
+    border-radius: 4px !important;
+    font-weight: 500 !important;
+}
+
+.stDownloadButton > button:hover {
+    background-color: #E6A629 !important;
+    color: white !important;
+    border: none !important;
+}
+
+.stDownloadButton > button:active, .stDownloadButton > button:focus {
+    background-color: #D4961F !important;
+    color: white !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+
+/* Estilização dos radio buttons */
+.stRadio > div > label > div[data-testid="stMarkdownContainer"] > p {
+    color: #333333 !important;
+}
+
+/* Personalização dos sliders */
+.stSlider > div > div > div > div {
+    background-color: #F5B52E !important;
+}
+
+/* Estilização dos expanders */
+.streamlit-expanderHeader {
+    background-color: #f8f9fa !important;
+    border-radius: 4px !important;
+}
+</style>
+""", unsafe_allow_html=True)
+
+
+# Cabeçalho com logo
+# OPÇÃO 1: Usando arquivo local
+logo_base64 = get_image_base64("logo_kluber.png")  # Substitua pelo caminho da sua imagem
+
+if logo_base64:
+    st.markdown(f"""
+    <div class="header-container">
+        <div class="logo-container">
+            <img src="data:image/png;base64,{logo_base64}" alt="Klüber Lubrication Logo">
+        </div>
+        <div class="title-container">
+            <h1>Predição de Recompra</h1>
+        </div>
+        <div style="flex: 0 0 auto; width: 200px;"></div> <!-- Espaçador para centralizar o título -->
+    </div>
+    """, unsafe_allow_html=True)
+else:
+    # Fallback caso a imagem não seja encontrada
+    st.markdown("""
+    <div class="header-container">
+        <div class="title-container">
+            <h1>📊 Predição de Recompra</h1>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+
+# OPÇÃO 2: Alternativa mais simples usando st.image()
+# Descomente as linhas abaixo se preferir usar esta opção:
+# col_logo, col_title, col_space = st.columns([1, 3, 1])
+# with col_logo:
+#     try:
+#         st.image("logo_kluber.png", width=200)  # Substitua pelo caminho da sua imagem
+#     except:
+#         st.write("")  # Logo não encontrado, continua sem erro
+# with col_title:
+#     st.title("📊 Predição de Recompra")
+
+# Alternativa usando colunas do Streamlit (caso prefira)
+# col_logo, col_title, col_space = st.columns([1, 3, 1])
+# with col_logo:
+#     st.image("logo_kluber.png", width=200)  # Substitua pelo caminho da sua imagem
+# with col_title:
+#     st.title("📊 Predição de Recompra")
+
+
+
+
 
 with st.expander("ℹ️ Sobre o modelo", expanded=False):
     st.markdown(
