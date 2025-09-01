@@ -187,7 +187,7 @@ else:
 
 
 
-with st.expander("ℹ️ Sobre o modelo", expanded=False):
+with st.expander("Sobre o modelo", expanded=False):
     st.markdown(
         """
         <div style="background-color: #f0f2f6; padding: 16px; border-radius: 8px;">
@@ -250,7 +250,7 @@ df2_clientes = df2_aux.copy()
 # =====================
 # 2️⃣ Métricas e Matrizes de Confusão
 # =====================
-with st.expander("📈 Resultados da Assertividade do Modelo", expanded=False):
+with st.expander("Resultados da Assertividade do Modelo", expanded=False):
     periodos = [("30 dias", "comprou_30d", "prob_30d"),
                 ("60 dias", "comprou_60d", "prob_60d"),
                 ("90 dias", "comprou_90d", "prob_90d")]
